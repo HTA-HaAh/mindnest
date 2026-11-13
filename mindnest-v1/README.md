@@ -72,3 +72,25 @@ supabase/schema.sql
 
 ## Product safety
 MINDNEST is a self-reflection and wellbeing tool, not a medical device, therapist or emergency service. Insights are descriptive patterns from user-entered data and must not be presented as diagnoses.
+
+## Enable account login and cloud sync (Supabase Free)
+
+The app now includes an email/password account panel and a user-scoped cloud sync adapter.
+
+1. Create a Supabase project on the Free plan at https://supabase.com/dashboard.
+2. Open **SQL Editor → New query**, paste and run the complete contents of `supabase/cloud-storage.sql`.
+3. Open **Project Settings → API** and copy the Project URL and `anon` / publishable key.
+4. In Vercel, open this project → **Settings → Environment Variables**. Add:
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase Project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon/publishable key
+5. Apply the variables to Production (and Preview if desired), save, then redeploy.
+6. In Supabase **Authentication → URL Configuration**, set the Site URL to your deployed Vercel URL and add that URL to Redirect URLs.
+7. Open MINDNEST, choose **Account → Đăng ký**, confirm the email if confirmation is enabled, then sign in.
+
+Only the public anon/publishable key belongs in the browser. Never put a Supabase service-role key or an AI provider secret in a `NEXT_PUBLIC_*` variable.
+
+Cloud data is stored as a per-user JSONB record in `public.user_data`. Row Level Security policies restrict read/write access to the authenticated owner. The SQL migration is in `supabase/cloud-storage.sql`.
+
+**Important:** The Supabase browser account and cloud sync implementation is an MVP integration. It has not yet been built or tested in a live Supabase/Vercel environment. Before inviting the public, test registration, email confirmation, login, logout, data sync across two browsers, account isolation with two separate users, and account deletion. Do not store crisis notes or highly sensitive identifying information until a privacy/security review is complete.
+
+Supabase Free currently includes a small database and file-storage allowance; free projects may pause after a period of inactivity. Vercel Hobby is limited to personal/non-commercial use. Review the current provider terms and quotas before operating a public service at scale.
